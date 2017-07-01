@@ -2,38 +2,36 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Contract;
 using Microsoft.AspNetCore.Mvc;
+using Service;
 
 namespace mongodb_migrations.Controllers
 {
     [Route("api/[controller]")]
-    public class ValuesController : Controller
+    public class ProjectsController : Controller
     {
+        ProjectService service = new ProjectService();
         // GET api/values
+        
         [HttpGet]
-        public async Task<IEnumerable<Model.Project>> Get()
+        public async Task<IEnumerable<Project>> Get()
         {
-            var repository = new Model.Repository();
-            return await repository.GetAsync();
+            return await service.GetProjectsAsync();
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public Task<Project> Get(int id)
         {
-            return "value";
+            return null;
         }
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]string value)
+        public async Task Post(string id)
         {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
+            await service.CreateProjectAsync(id);
         }
 
         // DELETE api/values/5
