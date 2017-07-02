@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Contract;
@@ -22,6 +23,11 @@ namespace Service
         public async Task CreateProjectAsync(string id)
         {
             await repository.CreateAsync(id);
+        }
+
+        public async Task<Project> GetProjectAsync(string id)
+        {
+            return await repository.GetAsync(id);
         }
     }
 }

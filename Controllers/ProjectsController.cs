@@ -20,11 +20,10 @@ namespace mongodb_migrations.Controllers
             return await service.GetProjectsAsync();
         }
 
-        // GET api/values/5
         [HttpGet("{id}")]
-        public Task<Project> Get(int id)
+        public async Task<Project> Get(string id)
         {
-            return null;
+            return await service.GetProjectAsync(id);
         }
 
         // POST api/values
