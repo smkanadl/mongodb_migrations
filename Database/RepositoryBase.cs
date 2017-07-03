@@ -17,6 +17,11 @@ namespace Model
         {
             client = new MongoClient("mongodb://localhost:27017");
             db = client.GetDatabase("test");
+            var pack = new MongoDB.Bson.Serialization.Conventions.ConventionPack
+            {
+                new MongoDB.Bson.Serialization.Conventions.CamelCaseElementNameConvention()
+            };
+            MongoDB.Bson.Serialization.Conventions.ConventionRegistry.Register("Conventions", pack, type => true);
         }
 
         protected RepositoryBase(string collection)

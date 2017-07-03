@@ -20,9 +20,9 @@ namespace Service
             return await repository.GetAsync();
         }
 
-        public async Task CreateProjectAsync(string id)
+        public async Task<Project> CreateProjectAsync()
         {
-            await repository.CreateAsync(id);
+            return await repository.CreateAsync();
         }
 
         public async Task<Project> GetProjectAsync(string id)

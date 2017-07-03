@@ -8,5 +8,7 @@ namespace Contract
         public string Id { get; set; }
         
         public System System { get; set; }
+
+        public int Version { get; set; }
     }
 }

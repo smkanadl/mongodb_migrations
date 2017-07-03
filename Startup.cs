@@ -38,6 +38,7 @@ namespace mongodb_migrations
             loggerFactory.AddDebug();
 
             app.UseMvc();
+            app.UseExceptionHandler();
         }
     }
 }

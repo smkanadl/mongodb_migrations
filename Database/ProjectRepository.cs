@@ -4,14 +4,18 @@ using Contract;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using mongodb_migrations.Database.Migration;
 
 namespace Model
 {
     public class ProjectRepository : RepositoryBase<Project>
     {
+        private MigrationRunner runner;
+
         public ProjectRepository()
             : base("projects")
-        {   
+        {
+            runner = new MigrationRunner("projects");
         }
 
         public async Task<List<Project>> GetAsync()
@@ -22,19 +26,31 @@ namespace Model
         public async Task<Project> GetAsync(string id)
         {
             var c = collection.Database.GetCollection<BsonDocument>("projects");
-            var filter = Builders<BsonDocument>.Filter.Eq("Id", id);
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", id);
             var project = await c.Find(filter).FirstOrDefaultAsync();
-            var version = project["version"].AsInt32;
-            if(version < Version.Current)
-            {
-                // run migration
-            }
+
+            await runner.Run(project);
+
             return BsonSerializer.Deserialize<Project>(project);
         }
-
-        public async Task CreateAsync(string id)
+        
+        public async Task<Project> CreateAsync()
         {
-            await collection.InsertOneAsync(new Project() { Id = id });
+            var id = ObjectId.GenerateNewId().ToString();
+            var project = new Project()
+            {
+                Id = id,
+                Name = "Project for id " + id,
+                System = new Contract.System()
+                {
+                    Elements = new List<Element>()
+                    {
+                        new Element() { Id = ObjectId.GenerateNewId().ToString(), Name = "my element" }
+                    }
+                }
+            };
+            await collection.InsertOneAsync(project);
+            return project;
         }
     }
 }

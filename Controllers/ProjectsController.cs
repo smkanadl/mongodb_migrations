@@ -28,9 +28,9 @@ namespace mongodb_migrations.Controllers
 
         // POST api/values
         [HttpPost]
-        public async Task Post(string id)
+        public async Task<Project> Post()
         {
-            await service.CreateProjectAsync(id);
+            return await service.CreateProjectAsync();
         }
 
         // DELETE api/values/5
