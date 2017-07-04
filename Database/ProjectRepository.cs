@@ -10,12 +10,12 @@ namespace Model
 {
     public class ProjectRepository : RepositoryBase<Project>
     {
-        private MigrationRunner runner;
+        private CollectionMigrationRunner runner;
 
         public ProjectRepository()
             : base("projects")
         {
-            runner = new MigrationRunner("projects");
+            runner = new CollectionMigrationRunner("projects");
         }
 
         public async Task<List<Project>> GetAsync()

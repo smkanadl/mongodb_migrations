@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +11,11 @@ namespace mongodb_migrations.Database.Migration
     public class MigrationRunner
     {
         private IEnumerable<IMigration> migrations;
-        
-        public MigrationRunner(string collection)
+
+        public MigrationRunner()
         {
             var current = Assembly.GetEntryAssembly();
             migrations = CreateInstancesByType<IMigration>(current)
-                .Where(c => c.Target == collection)
                 .OrderBy(m => m.Date);
         }
 
@@ -27,16 +27,33 @@ namespace mongodb_migrations.Database.Migration
                 .OfType<T>();
         }
 
-        public async Task Run(BsonDocument doc)
+        public bool IsRunning { get; private set; }
+
+        public async Task Run()
         {
-            var currentVersion = doc.Contains("version") ? doc["version"].AsInt32 : 0;
-            if (currentVersion < Contract.Version.Current)
+            IsRunning = true;
+            try
             {
-                var missing = migrations.Where(m => m.Version > currentVersion);
-                foreach (var item in missing)
+                var client = new MongoClient();
+                var db = client.GetDatabase("test");
+
+                // TODO: Filter migrations to avoid addtional workload
+                
+                foreach (var item in migrations)
                 {
-                    await item.Run(doc);
+                    var collection = db.GetCollection<BsonDocument>(item.Target);
+                    await collection.Find(d => true).ForEachAsync(async d =>
+                    {
+                        await Task.Delay(5000);
+                        await item.Run(d);
+                        await collection.ReplaceOneAsync(
+                            Builders<BsonDocument>.Filter.Eq("_id", d["_id"]), d);
+                    });
                 }
+            }
+            finally
+            {
+                IsRunning = false;
             }
         }
     }

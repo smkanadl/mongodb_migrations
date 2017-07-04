@@ -12,8 +12,14 @@ namespace mongodb_migrations.Controllers
     public class ProjectsController : Controller
     {
         ProjectService service = new ProjectService();
+        readonly Database.Migration.MigrationRunner runner;
+
+        public ProjectsController(Database.Migration.MigrationRunner runner)
+        {
+            this.runner = runner;
+        }
+
         // GET api/values
-        
         [HttpGet]
         public async Task<IEnumerable<Project>> Get()
         {
@@ -23,6 +29,11 @@ namespace mongodb_migrations.Controllers
         [HttpGet("{id}")]
         public async Task<Project> Get(string id)
         {
+            if (runner.IsRunning)
+            {
+                Response.StatusCode = 503;
+                return null;
+            }
             return await service.GetProjectAsync(id);
         }
 

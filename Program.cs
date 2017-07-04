@@ -19,6 +19,9 @@ namespace mongodb_migrations
                 .UseStartup<Startup>()
                 .Build();
 
+            var runner = (Database.Migration.MigrationRunner)host.Services.GetService(typeof(Database.Migration.MigrationRunner));
+            var forget = runner.Run();
+
             host.Run();
         }
     }
